@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='backoffice'>
+	<inherits name="com.google.gwt.user.User"/>
+	<inherits name="com.google.gwt.user.theme.standard.Standard"/>
+	<inherits name="com.google.gwt.requestfactory.RequestFactory"/>
+	
+	<inherits name="org.mdkt.library.CommonLibrary"/>
+	
+	<entry-point class="org.mdkt.backoffice.client.BackOffice"/>
+	
+	<!-- Specify the paths for translatable code -->
+	<source path='client' />
+	<source path='shared' />
+</module>

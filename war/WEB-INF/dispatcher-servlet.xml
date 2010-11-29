@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<bean id="heartBeatService" class="org.mdkt.library.server.HeartBeatServiceImpl" />
+	<bean id="loginService" class="org.mdkt.library.server.LoginServiceImpl" />
+	
+	<bean id="usersService" class="org.mdkt.backoffice.server.rpc.UsersServiceImpl">
+		<property name="userRegistry" ref="userRegistry"/>
+	</bean>
+	
+	<bean id="distListService" class="org.mdkt.maildist.server.rpc.DistListServiceImpl">
+		<property name="distListRegistry" ref="distListRegistry"/>
+	</bean>
+	
+	<bean class="org.mdkt.library.server.support.GwtHandlerMapping" />
+	
+	<bean class="org.mdkt.library.server.support.GwtServiceHandlerAdapter" />
+	
+</beans>

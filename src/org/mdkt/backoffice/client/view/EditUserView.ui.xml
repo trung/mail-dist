@@ -1,0 +1,74 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client">
+
+	<ui:style>
+		.error {
+			color: red;
+		}
+	</ui:style>
+	
+	<g:HTMLPanel>
+		<g:VerticalPanel>
+			<g:cell height="27">
+				<g:HorizontalPanel ui:field="breadCumb"/>
+			</g:cell>
+			<g:HorizontalPanel>
+				<g:Button ui:field="saveButton"><ui:msg>Save</ui:msg></g:Button>
+				<g:Button ui:field="cancelButton"><ui:msg>Cancel</ui:msg></g:Button>
+			</g:HorizontalPanel>
+			<g:Grid>
+				<g:row>
+					<g:customCell>
+						<g:Label horizontalAlignment="ALIGN_RIGHT"><ui:msg>Email</ui:msg> *</g:Label>
+					</g:customCell>
+					<g:customCell>
+						<g:HorizontalPanel >
+							<g:cell>
+								<g:TextBox ui:field="email"/>
+							</g:cell>
+						</g:HorizontalPanel>
+					</g:customCell>
+					<g:customCell>
+						<g:Label styleName="{style.error}" ui:field="errorEmail"></g:Label>
+					</g:customCell>
+				</g:row>
+				<g:row>
+					<g:customCell>
+						<g:Label horizontalAlignment="ALIGN_RIGHT"><ui:msg>Firstname</ui:msg> *</g:Label>
+					</g:customCell>
+					<g:customCell>
+						<g:TextBox ui:field="firstname"/>
+					</g:customCell>
+					<g:customCell>
+						<g:Label styleName="{style.error}" ui:field="errorFirstname"></g:Label>
+					</g:customCell>
+				</g:row>
+				<g:row>
+					<g:customCell>
+						<g:Label horizontalAlignment="ALIGN_RIGHT"><ui:msg>Lastname</ui:msg> *</g:Label>
+					</g:customCell>
+					<g:customCell>
+						<g:TextBox ui:field="lastname"/>
+					</g:customCell>
+					<g:customCell>
+						<g:Label styleName="{style.error}" ui:field="errorLastname"></g:Label>
+					</g:customCell>
+				</g:row>
+				<g:row>
+					<g:customCell>
+						<g:Label horizontalAlignment="ALIGN_RIGHT"><ui:msg>Roles</ui:msg></g:Label>
+					</g:customCell>
+					<g:customCell>
+						<g:VerticalPanel ui:field="roles">
+							<g:CheckBox>ADMIN</g:CheckBox>
+							<g:CheckBox>REG_USER</g:CheckBox>
+							<g:CheckBox enabled="false" checked="true">USER</g:CheckBox>
+						</g:VerticalPanel>
+					</g:customCell>
+				</g:row>
+			</g:Grid>
+		</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

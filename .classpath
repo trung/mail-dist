@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="test-classes" path="test"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.context-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.core-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.web-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.springframework.web.servlet-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-security-config-3.1.0.CI-20101105.100426-237.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-security-core-3.1.0.CI-20101105.100444-240.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-security-taglibs-3.1.0.CI-20101105.100545-237.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-security-web-3.1.0.CI-20101105.100602-240.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xalan-2.7.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-111.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>

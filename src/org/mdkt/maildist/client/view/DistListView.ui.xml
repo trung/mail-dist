@@ -1,0 +1,59 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client">
+	<ui:style>
+		.clickable {
+			cursor: pointer;
+		}
+		.menuItem {
+			border-spacing: 0px;
+		}
+
+		.menuBar {
+			margin: 0px;
+			padding: 0px;
+			background-color: white;
+		}
+		.menuBar table {
+			border-spacing: 0px 0px;
+		}
+	</ui:style>
+	
+	<g:HTMLPanel>
+		<g:VerticalPanel width="100%">
+			<g:cell>
+				<g:HorizontalPanel>
+					<g:cell>
+						<g:Button ui:field="addButton"><ui:msg>New distribution list</ui:msg></g:Button>
+					</g:cell>
+					<g:cell>
+						<g:MenuBar styleName="{style.menuBar}">
+							<g:MenuItem styleName="gwt-Button"><ui:msg>More actions</ui:msg>&nbsp;&#9660;
+								<g:MenuBar vertical="true">
+									<g:MenuItem ui:field="deleteDistList"><ui:msg>Delete</ui:msg></g:MenuItem>
+									<g:MenuItem ui:field="exportCsv"><ui:msg>Export to CSV</ui:msg></g:MenuItem>
+								</g:MenuBar>
+							</g:MenuItem>
+						</g:MenuBar>
+					</g:cell>
+				</g:HorizontalPanel>
+			</g:cell>
+			<g:cell height="5px"><g:Label></g:Label></g:cell>
+			<g:cell>
+				<g:HorizontalPanel>
+					<g:Label><ui:msg>Select</ui:msg></g:Label>
+					<g:Label>&nbsp;</g:Label>
+					<g:Anchor ui:field="selectNone" styleName="{style.clickable}"><ui:msg>none</ui:msg></g:Anchor>
+					<g:Label>,&nbsp;</g:Label>
+					<g:Anchor ui:field="selectAll" styleName="{style.clickable}"><ui:msg>all</ui:msg></g:Anchor>
+				</g:HorizontalPanel>
+			</g:cell>
+			<g:cell>
+				<g:HTMLPanel>
+					<c:CellTable ui:field="distListTable"/>
+				</g:HTMLPanel>
+			</g:cell>
+		</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.error {
+			color: red;
+		}
+	</ui:style>
+
+	<g:HTMLPanel>
+		<g:VerticalPanel>
+			<g:cell>
+				<g:HorizontalPanel>
+					<g:Button ui:field="addButton">Save</g:Button>
+					<g:Button ui:field="cancelButton">Cancel</g:Button>
+				</g:HorizontalPanel>
+			</g:cell>
+			<g:cell>
+					<g:Label>Enter email addresses to add as members</g:Label>
+			</g:cell>
+			<g:cell>
+					<g:TextArea characterWidth="80" visibleLines="15" ui:field="members"></g:TextArea>
+			</g:cell>
+		</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 
