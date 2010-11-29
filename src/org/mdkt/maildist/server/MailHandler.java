@@ -10,7 +10,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -21,6 +24,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,30 +80,32 @@ public class MailHandler extends HttpServlet {
 			logger.info(new StringBuffer("[").append(fromAddress.getAddress())
 					.append("] with distListId=[").append(distListId)
 					.append("] has ").append(members.size()).append(" members"));
+			
+			Address[] ccAddresses = message.getRecipients(RecipientType.CC);
+			Address[] bccAddresses = message.getRecipients(RecipientType.BCC);
 
 			Object content = message.getContent();
-			String msgBody = "";
+			ArrayList<MessageBody> msgBodies = new ArrayList<MessageBody>();
 			String contentType = "text/html";
-			Attachment attachment = null;
+			ArrayList<Attachment> attachments = null;
 			if (content instanceof String) {
-				msgBody = (String) content;
+				msgBodies.add(new MessageBody((String) content, contentType));
 			} else if (content instanceof Multipart) {
 				Multipart multipart = (Multipart) content;
+				logHiararchy(multipart, 0);
 				Part part = multipart.getBodyPart(0);
 				Object partContent = part.getContent();
-				logger.info("Content type: " + part.getContentType());
 				contentType = part.getContentType();
 				if (partContent instanceof String) {
-					msgBody = (String) partContent;
+					msgBodies.add(new MessageBody((String) partContent, contentType));
+				} else if (partContent instanceof Multipart) {
+					msgBodies = getMessageBody((Multipart) partContent);
 				}
 				// extract attachment if any
-				attachment = getMailAttachmentBytes(multipart);
-				if (attachment != null) {
-					logger.info("Attachment fileName [" + attachment.fileName + "] with data size [" + attachment.getFileSize() + "] contentType [" + attachment.contentType + "]");
-				}
+				attachments = getAttachments(multipart);
 			}
 			String subject = message.getSubject();
-			send(fromAddress, subject, msgBody, contentType, attachment, members);			
+			send(fromAddress, ccAddresses, bccAddresses, subject, msgBodies, attachments, members);			
 
 		} catch (Exception e) {
 			logger.error(e, e);
@@ -111,30 +117,100 @@ public class MailHandler extends HttpServlet {
 		}
 	}
 
+	private void logHiararchy(Multipart multipart, int level) throws Exception {
+		for (int i = 0; i < multipart.getCount(); i++) {
+			Part p = multipart.getBodyPart(i);
+			String disposition = p.getDisposition();
+			String contentType = p.getContentType();
+			if (disposition != null && (disposition.equals(Part.ATTACHMENT) || (disposition
+					.equals(Part.INLINE)))) {
+				logger.info(space(level) + "attachment[" + contentType + "]");
+			} else {
+				Object content = p.getContent();
+				if (content instanceof String) {
+					logger.info(space(level) + "String[" + contentType + "]");
+				} else if (content instanceof Multipart) {
+					logHiararchy((Multipart) content, level + 1);
+				} else {
+					logger.info("Unknown type " + content + "[" + contentType + "]");
+				}
+			}
+		}
+	}
+
+	private String space(int level) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < level; i++) {
+			buf.append("   ");
+		}
+		return buf.toString();
+	}
+
+	private ArrayList<MessageBody> getMessageBody(Multipart partContent) throws Exception {
+		ArrayList<MessageBody> bodies = new ArrayList<MessageBody>();
+		for (int i = 0; i < partContent.getCount(); i++) {
+			Part p = partContent.getBodyPart(i);
+			Object content = p.getContent();
+			if (content instanceof String) {
+				MessageBody msgBody = new MessageBody((String) content, p.getContentType());
+				logger.info("Message body string[" + msgBody.contentType + "]");
+				bodies.add(msgBody);
+			}
+		}
+		return bodies.size() == 0 ? null : bodies;
+	}
+
 	private void send(InternetAddress fromAddress,
-			String subject, String msgBody, String contentType, Attachment attachment,
+			Address[] ccAddresses, Address[] bccAddresses, String subject, ArrayList<MessageBody> msgBodies, ArrayList<Attachment> attachments,
 			ArrayList<DistListMember> members) throws Exception {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 		MimeMessage forwardedMessage = new MimeMessage(session);
 		forwardedMessage.setSubject(subject);
 		forwardedMessage.setFrom(fromAddress);
-		if (attachment != null) {
+		if (ccAddresses != null)
+			forwardedMessage.setRecipients(RecipientType.CC, ccAddresses);
+		if (bccAddresses != null)
+			forwardedMessage.setRecipients(RecipientType.BCC, bccAddresses);
+		
+		if (attachments != null) {
 			// using multipart
-			Multipart mp = new MimeMultipart();
-			MimeBodyPart htmlPart = new MimeBodyPart();
-			htmlPart.setContent(msgBody, contentType);
-			mp.addBodyPart(htmlPart);
+			MimeMultipart mp = new MimeMultipart();
+			if (msgBodies != null) {
+				for (MessageBody msgBody : msgBodies) {					
+					MimeBodyPart htmlPart = new MimeBodyPart();
+					htmlPart.setContent(msgBody.msgBody, msgBody.contentType);
+					mp.addBodyPart(htmlPart);
+				}					
+			}
 			
-			MimeBodyPart attachmentPart = new MimeBodyPart();
-			attachmentPart.setFileName(attachment.fileName);
-			attachmentPart.setContent(attachment.data, attachment.contentType);
-			mp.addBodyPart(attachmentPart);
+			for (Attachment attachment : attachments) {
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				attachmentPart.setFileName(attachment.fileName);
+				attachmentPart.setDisposition(Part.ATTACHMENT);
+				DataSource src = new ByteArrayDataSource(attachment.data, attachment.contentType);
+				DataHandler handler = new DataHandler(src);
+				attachmentPart.setDataHandler(handler);
+				
+				mp.addBodyPart(attachmentPart);
+			}
 			
 			forwardedMessage.setContent(mp);
 		} else {
-			forwardedMessage.setContent(msgBody, contentType);
+			if (msgBodies.size() > 1) {
+				MimeMultipart mp = new MimeMultipart();
+				for (MessageBody msgBody : msgBodies) {					
+					MimeBodyPart htmlPart = new MimeBodyPart();
+					htmlPart.setContent(msgBody.msgBody, msgBody.contentType);
+					mp.addBodyPart(htmlPart);
+				}
+				forwardedMessage.setContent(mp);
+			} else {
+				MessageBody msgBody = msgBodies.get(0);
+				forwardedMessage.setContent(msgBody.msgBody, msgBody.contentType);
+			}
 		}
+		
 		for (DistListMember member : members) {
 			// do forwading
 			forwardedMessage.setRecipient(RecipientType.TO, new InternetAddress(member.getEmail(), member.getName()));
@@ -157,24 +233,32 @@ public class MailHandler extends HttpServlet {
 	 * @throws MessagingException
 	 * @throws IOException
 	 */
-	private Attachment getMailAttachmentBytes(Multipart mimeMultipart)
-			throws MessagingException, IOException {
+	private ArrayList<Attachment> getAttachments(Multipart mimeMultipart)
+			throws Exception {
+		ArrayList<Attachment> attachments = new ArrayList<Attachment>();
+		for (int i = 0, n = mimeMultipart.getCount(); i < n; i++) {
+			BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+			
+			String disposition = bodyPart.getDisposition();
+			if (disposition == null) {
+				continue;
+			}
+			if ((disposition.equals(Part.ATTACHMENT) || (disposition
+					.equals(Part.INLINE)))) {
+				Attachment attachment = getAttachment(bodyPart);
+				logger.info("Attachment fileName [" + attachment.fileName + "] with data size [" + attachment.getFileSize() + "] contentType [" + attachment.contentType + "]");
+				attachments.add(attachment);
+			}
+		}
+		return attachments.size() == 0 ? null : attachments;
+	}
+
+	private Attachment getAttachment(BodyPart bodyPart) throws Exception {
 		InputStream attachmentInputStream = null;
 		try {
-			for (int i = 0, n = mimeMultipart.getCount(); i < n; i++) {
-				String disposition = mimeMultipart.getBodyPart(i)
-						.getDisposition();
-				if (disposition == null) {
-					continue;
-				}
-				if ((disposition.equals(Part.ATTACHMENT) || (disposition
-						.equals(Part.INLINE)))) {
-					attachmentInputStream = mimeMultipart.getBodyPart(i)
-							.getInputStream();
-					byte[] imageData = getImageDataFromInputStream(attachmentInputStream);
-					return new Attachment(mimeMultipart.getBodyPart(i).getFileName(), imageData, mimeMultipart.getBodyPart(i).getContentType());
-				}
-			}
+			attachmentInputStream = bodyPart.getInputStream();
+			byte[] imageData = getImageDataFromInputStream(attachmentInputStream);
+			return new Attachment(bodyPart.getFileName(), imageData, bodyPart.getContentType());
 		} finally {
 			try {
 				if (attachmentInputStream != null)
@@ -182,7 +266,6 @@ public class MailHandler extends HttpServlet {
 			} catch (Exception e) {
 			}
 		}
-		return null;
 	}
 
 	public byte[] getImageDataFromInputStream(InputStream inputStream) throws IOException {
@@ -215,6 +298,21 @@ public class MailHandler extends HttpServlet {
 	}
 }
 
+class MessageBody {
+	public String msgBody;
+	public String contentType;
+	
+	public MessageBody(String body, String contentType) {
+		this.msgBody = body;
+		this.contentType = contentType;
+	}
+	
+	@Override
+	public String toString() {
+		return new StringBuffer("MessageBody {contentType=[").append(contentType).append("]}").toString();
+	}
+}
+
 class Attachment {
 	public byte[] data;
 	public String fileName;
@@ -223,7 +321,8 @@ class Attachment {
 	public Attachment(String fileName, byte[] data, String contentType) {
 		this.data = data;
 		this.fileName = fileName;
-		this.contentType = contentType;
+		int id = contentType.indexOf(";");
+		this.contentType = id > -1 ? contentType.substring(0, id) : contentType;;
 	}
 
 	public int getFileSize() {
