@@ -54,6 +54,9 @@
 					<c:CellTable ui:field="distListTable"/>
 				</g:HTMLPanel>
 			</g:cell>
+			<g:cell>
+				<c:SimplePager ui:field="pager" />
+			</g:cell>
 		</g:VerticalPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

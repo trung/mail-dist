@@ -4,7 +4,6 @@
 package org.mdkt.maildist.client.view;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.mdkt.maildist.client.dto.DistList;
 
@@ -25,6 +24,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.CellTable.Style;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -67,6 +68,8 @@ public class DistListViewImpl extends Composite implements DistListView {
 	Button addButton;
 	@UiField(provided = true)
 	CellTable<DistList> distListTable;
+	@UiField(provided = true)
+	SimplePager pager;
 	@UiField
 	Anchor selectNone;
 	@UiField
@@ -158,6 +161,13 @@ public class DistListViewImpl extends Composite implements DistListView {
 				20,
 				GWT.<DistListTableResources> create(DistListTableResources.class),
 				key);
+	    // Create a Pager to control the table.
+	    SimplePager.Resources pagerResources = GWT.create(
+	        SimplePager.Resources.class);
+	    pager = new SimplePager(
+	        TextLocation.CENTER, pagerResources, false, 0, true);
+	    pager.setDisplay(distListTable);
+
 		distListTable
 				.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
 		selectionModel = new MultiSelectionModel<DistList>(key);

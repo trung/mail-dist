@@ -82,7 +82,7 @@ public class MailDistAppController extends AbstractAppController {
 			
 			@Override
 			public void onDistListDeleted(DistListDeletedEvent event) {
-				History.newItem(MD_HOME);
+				History.fireCurrentHistoryState();
 			}
 		});
 		eventBus.addHandler(ShowDistListMemberEvent.getType(),new ShowDistListMemberEvent.Handler() {

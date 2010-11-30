@@ -39,6 +39,10 @@ public class GaeDistListRegsitry implements DistListRegistry {
 	public void deleteDistLists(ArrayList<String> distListIds) {
 		ArrayList<Key> keys = new ArrayList<Key>();
     	for (String id : distListIds) {
+    		ArrayList<DistListMember> members = findDistListMembers(id);
+    		for (DistListMember m : members) {
+    			keys.add(KeyFactory.createKey(DIST_LIST_MEMBER_TYPE, m.getDistListMemberId()));
+    		}
     		keys.add(KeyFactory.createKey(DIST_LIST_TYPE, id));
     	}
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
