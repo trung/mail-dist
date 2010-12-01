@@ -9,6 +9,7 @@ import java.util.Map;
 import org.mdkt.maildist.client.MailDistAppController;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -49,7 +50,7 @@ public class MailDistHome extends Composite {
 	 * implement HasHTML instead of HasText.
 	 */
 	public MailDistHome() {
-		initWidget(uiBinder.createAndBindUi(this));
+		tabBar = new TabLayoutPanel(1.5, Unit.EM);
 		tabContainers = new HashMap<String, HasWidgets>();
 		for (String tabName : TAB_NAMES) {
 			VerticalPanel container = new VerticalPanel();
@@ -60,9 +61,10 @@ public class MailDistHome extends Composite {
 			tabBar.add(container, tabName);
 		}
 		tabBar.selectTab(0);
+		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	@UiField TabLayoutPanel tabBar;
+	@UiField (provided = true) TabLayoutPanel tabBar;
 	
 	@UiHandler("tabBar")
 	public void addSelectionHandler(SelectionEvent<Integer> event) {
