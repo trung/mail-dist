@@ -50,7 +50,7 @@ public class AddAliasPresenter implements Presenter, AddAliasView.Presenter {
 		aliasService.findAlias(aliasName, new DefaultAsyncCallBack<Boolean>("find alias") {
 			public void _onSuccess(Boolean result) {
 				if (result) {
-					view.setErrorAlias("The distribution list already exists");
+					view.setErrorAlias("The alias email already exists");
 				} else {
 					eventBus.fireEvent(new SaveAliasEvent(aliasName));
 				}

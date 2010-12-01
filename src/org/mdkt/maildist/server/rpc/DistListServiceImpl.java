@@ -82,7 +82,7 @@ public class DistListServiceImpl implements DistListService {
 	public void addEmailAlias(String email) {
 		Alias alias = new Alias();
 		String userEmail = getCurrentUser().getEmail();
-		alias.setAliasId(userEmail + email);
+		alias.setAliasId(email);
 		alias.setEmail(email);
 		alias.setUserEmail(userEmail);
 		distListRegistry.saveEmailAlias(alias);
@@ -90,7 +90,7 @@ public class DistListServiceImpl implements DistListService {
 	
 	@Override
 	public boolean findAlias(String aliasName) {
-		String aliasId = getCurrentUser().getEmail() + aliasName;
+		String aliasId = aliasName;
 		return distListRegistry.aliasExists(aliasId) != null;
 	}
 }
