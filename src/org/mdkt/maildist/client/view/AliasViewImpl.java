@@ -5,17 +5,14 @@ package org.mdkt.maildist.client.view;
 
 import java.util.ArrayList;
 
-import org.mdkt.maildist.client.dto.DistList;
+import org.mdkt.maildist.client.dto.Alias;
 
 import com.google.gwt.cell.client.CheckboxCell;
-import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -38,27 +35,27 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 /**
- * Define the distList page. Provide <br/>
+ * Define the alias page. Provide <br/>
  * <ul>
  * <li>Create a new user</li>
  * <li>Edit an existing user</li>
  * <li>Delete selected user(s)</li>
- * <li>Export distList to CSV</li>
+ * <li>Export alias to CSV</li>
  * </ul>
  * 
  * @author trung
  * 
  */
-public class DistListViewImpl extends Composite implements DistListView {
+public class AliasViewImpl extends Composite implements AliasView {
 
-	private static DistListViewUiBinder uiBinder = GWT
-			.create(DistListViewUiBinder.class);
+	private static AliasViewUiBinder uiBinder = GWT
+			.create(AliasViewUiBinder.class);
 
-	@UiTemplate("DistListView.ui.xml")
-	interface DistListViewUiBinder extends UiBinder<Widget, DistListViewImpl> {
+	@UiTemplate("AliasView.ui.xml")
+	interface AliasViewUiBinder extends UiBinder<Widget, AliasViewImpl> {
 	}
 
-	interface DistListTableResources extends CellTable.Resources {
+	interface AliasTableResources extends CellTable.Resources {
 		@Source(value = { CellTable.Style.DEFAULT_CSS,
 				"../css/DistListTableStyle.css" })
 		Style cellTableStyle();
@@ -67,7 +64,7 @@ public class DistListViewImpl extends Composite implements DistListView {
 	@UiField
 	Button addButton;
 	@UiField(provided = true)
-	CellTable<DistList> distListTable;
+	CellTable<Alias> aliasTable;
 	@UiField(provided = true)
 	SimplePager pager;
 	@UiField
@@ -76,25 +73,25 @@ public class DistListViewImpl extends Composite implements DistListView {
 	Anchor selectAll;
 
 	@UiField
-	MenuItem deleteDistList;
+	MenuItem deleteAlias;
 	@UiField
 	MenuItem exportCsv;
 
 	private Presenter presenter;
-	private ArrayList<DistList> rowData;
-	private MultiSelectionModel<DistList> selectionModel;
+	private ArrayList<Alias> rowData;
+	private MultiSelectionModel<Alias> selectionModel;
 
 	/**
 	 * Because this class has a default constructor, it can be used as a binder
 	 * template. In other words, it can be used in other *.ui.xml files as
 	 * follows: <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	 * xmlns:g="urn:import:**user's package**">
-	 * <g:**DistListClassName**>Hello!</g:**DistListClassName> </ui:UiBinder>
+	 * <g:**AliasClassName**>Hello!</g:**AliasClassName> </ui:UiBinder>
 	 * Note that depending on the widget that is used, it may be necessary to
 	 * implement HasHTML instead of HasText.
 	 */
-	public DistListViewImpl() {
-		initializeDistListTable();
+	public AliasViewImpl() {
+		initializeAliasTable();
 		initWidget(uiBinder.createAndBindUi(this));
 		bind();
 	}
@@ -104,7 +101,7 @@ public class DistListViewImpl extends Composite implements DistListView {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				for (DistList u : selectionModel.getSelectedSet()) {
+				for (Alias u : selectionModel.getSelectedSet()) {
 					selectionModel.setSelected(u, false);
 				}
 			}
@@ -113,7 +110,7 @@ public class DistListViewImpl extends Composite implements DistListView {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				for (DistList object : distListTable.getDisplayedItems()) {
+				for (Alias object : aliasTable.getDisplayedItems()) {
 					selectionModel.setSelected(object, true);
 				}
 			}
@@ -123,19 +120,19 @@ public class DistListViewImpl extends Composite implements DistListView {
 
 					@Override
 					public void onSelectionChange(SelectionChangeEvent event) {
-						deleteDistList.setEnabled(selectionModel
+						deleteAlias.setEnabled(selectionModel
 								.getSelectedSet().size() > 0);
 					}
 				});
-		deleteDistList.setEnabled(false);
-		deleteDistList.setCommand(new Command() {
+		deleteAlias.setEnabled(false);
+		deleteAlias.setCommand(new Command() {
 
 			@Override
 			public void execute() {
 				if (presenter != null) {
 					presenter.onDeleteButtonClicked();
 				}
-				deleteDistList.setEnabled(false);
+				deleteAlias.setEnabled(false);
 			}
 		});
 
@@ -150,89 +147,61 @@ public class DistListViewImpl extends Composite implements DistListView {
 		});
 	}
 
-	private void initializeDistListTable() {
-		ProvidesKey<DistList> key = new ProvidesKey<DistList>() {
+	private void initializeAliasTable() {
+		ProvidesKey<Alias> key = new ProvidesKey<Alias>() {
 			@Override
-			public Object getKey(DistList item) {
-				return item.getDistListId();
+			public Object getKey(Alias item) {
+				return item.getAliasId();
 			}
 		};
-		distListTable = new CellTable<DistList>(
+		aliasTable = new CellTable<Alias>(
 				10,
-				GWT.<DistListTableResources> create(DistListTableResources.class),
+				GWT.<AliasTableResources> create(AliasTableResources.class),
 				key);
 	    // Create a Pager to control the table.
 	    SimplePager.Resources pagerResources = GWT.create(
 	        SimplePager.Resources.class);
 	    pager = new SimplePager(
 	        TextLocation.CENTER, pagerResources, false, 0, true);
-	    pager.setDisplay(distListTable);
+	    pager.setDisplay(aliasTable);
 
-		distListTable
+		aliasTable
 				.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
-		selectionModel = new MultiSelectionModel<DistList>(key);
-		distListTable.setSelectionModel(selectionModel);
-		Column<DistList, Boolean> checkColumn = new Column<DistList, Boolean>(
+		selectionModel = new MultiSelectionModel<Alias>(key);
+		aliasTable.setSelectionModel(selectionModel);
+		Column<Alias, Boolean> checkColumn = new Column<Alias, Boolean>(
 				new CheckboxCell(true)) {
 			@Override
-			public Boolean getValue(DistList object) {
+			public Boolean getValue(Alias object) {
 				return selectionModel.isSelected(object);
 			}
 		};
-		checkColumn.setFieldUpdater(new FieldUpdater<DistList, Boolean>() {
+		checkColumn.setFieldUpdater(new FieldUpdater<Alias, Boolean>() {
 
 			@Override
-			public void update(int index, DistList object, Boolean value) {
+			public void update(int index, Alias object, Boolean value) {
 				selectionModel.setSelected(object, value);
 			}
 		});
-		distListTable.addColumn(checkColumn);
-		final Column<DistList, String> nameCol = new Column<DistList, String>(
-				new ClickableTextCell()) {
+		aliasTable.addColumn(checkColumn);
+		aliasTable.addColumn(new Column<Alias, String>(new TextCell()) {
 			@Override
-			public String getValue(DistList object) {
-				return object.getDistListId();
+			public String getValue(Alias object) {
+				return object.getEmail();
 			}
-
-			@Override
-			public void render(DistList object,
-					ProvidesKey<DistList> keyProvider, SafeHtmlBuilder sb) {
-				String v = getValue(object);
-				if (v != null) {
-					sb.append(SafeHtmlUtils
-							.fromTrustedString("<a style=\"cursor: pointer; text-decoration: underline\">"
-									+ v + "</a>"));
-				}
-			}
-		};
-		nameCol.setFieldUpdater(new FieldUpdater<DistList, String>() {
-			@Override
-			public void update(int index, DistList object, String value) {
-				if (presenter != null) {
-					presenter.onDistListClicked(object);
-				}
-			}
-		});
-		distListTable.addColumn(nameCol, "Name");
-		
-		distListTable.addColumn(new Column<DistList, String>(new TextCell()) {
-			@Override
-			public String getValue(DistList object) {
-				return String.valueOf(object.getNoOfMembers());
-			}
-		}, "No of members");
+		}, "Email Alias");
 	}
 
 	@Override
-	public void setPresenter(DistListView.Presenter presenter) {
+	public void setPresenter(AliasView.Presenter presenter) {
 		this.presenter = presenter;
 	}
 
 	@Override
-	public void setRowData(ArrayList<DistList> rowData) {
+	public void setRowData(ArrayList<Alias> rowData) {
 		this.rowData = rowData;
-		// construct distList table data here
-		new ListDataProvider<DistList>(rowData).addDataDisplay(distListTable);
+		// construct alias table data here
+		new ListDataProvider<Alias>(rowData).addDataDisplay(aliasTable);
 	}
 
 	@UiHandler("addButton")
@@ -248,7 +217,7 @@ public class DistListViewImpl extends Composite implements DistListView {
 	}
 
 	@Override
-	public MultiSelectionModel<DistList> getSelectionModel() {
+	public MultiSelectionModel<Alias> getSelectionModel() {
 		return selectionModel;
 	}
 

@@ -25,19 +25,13 @@
 			<g:cell>
 				<g:HorizontalPanel>
 					<g:cell>
-						<g:Hyperlink ui:field="backButton"></g:Hyperlink>
-					</g:cell>
-					<g:cell>
-						<g:HTML>&nbsp;&nbsp;&nbsp;</g:HTML>
-					</g:cell>
-					<g:cell>
-						<g:Button ui:field="addButton"><ui:msg>Add more members</ui:msg></g:Button>
+						<g:Button ui:field="addButton"><ui:msg>New email alias</ui:msg></g:Button>
 					</g:cell>
 					<g:cell>
 						<g:MenuBar styleName="{style.menuBar}">
 							<g:MenuItem styleName="gwt-Button"><ui:msg>More actions</ui:msg>&nbsp;&#9660;
 								<g:MenuBar vertical="true">
-									<g:MenuItem ui:field="deleteDistListMembers"><ui:msg>Delete members</ui:msg></g:MenuItem>
+									<g:MenuItem ui:field="deleteAlias"><ui:msg>Delete</ui:msg></g:MenuItem>
 									<g:MenuItem ui:field="exportCsv"><ui:msg>Export to CSV</ui:msg></g:MenuItem>
 								</g:MenuBar>
 							</g:MenuItem>
@@ -57,7 +51,7 @@
 			</g:cell>
 			<g:cell>
 				<g:HTMLPanel>
-					<c:CellTable ui:field="distListMembersTable"/>
+					<c:CellTable ui:field="aliasTable"/>
 				</g:HTMLPanel>
 			</g:cell>
 			<g:cell>

@@ -5,6 +5,7 @@ package org.mdkt.maildist.server;
 
 import java.util.ArrayList;
 
+import org.mdkt.maildist.client.dto.Alias;
 import org.mdkt.maildist.client.dto.DistList;
 import org.mdkt.maildist.client.dto.DistListMember;
 
@@ -32,4 +33,13 @@ public interface DistListRegistry {
 
 	ArrayList<DistListMember> findDistListMembers(String distListId,
 			String userEmail);
+
+	ArrayList<Alias> findAllAliases(String email);
+
+	void deleteAliases(ArrayList<String> aliasIds);
+
+	void saveEmailAlias(Alias alias);
+
+	String aliasExists(String aliasName);
+
 }

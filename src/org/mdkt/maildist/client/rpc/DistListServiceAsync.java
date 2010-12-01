@@ -5,6 +5,8 @@ package org.mdkt.maildist.client.rpc;
 
 import java.util.ArrayList;
 
+import org.mdkt.library.client.rpc.DefaultAsyncCallBack;
+import org.mdkt.maildist.client.dto.Alias;
 import org.mdkt.maildist.client.dto.DistList;
 import org.mdkt.maildist.client.dto.DistListMember;
 
@@ -34,6 +36,18 @@ public interface DistListServiceAsync {
 
 	void findDistList(String distListName,
 			AsyncCallback<Boolean> callback);
+
+	void getAliasEmails(
+			AsyncCallback<ArrayList<Alias>> callBack);
+
+	void deleteAliasEmails(ArrayList<String> aliasIds,
+			AsyncCallback<Void> callback);
+
+	void addEmailAlias(String email,
+			AsyncCallback<Void> callBack);
+
+	void findAlias(String aliasName,
+			AsyncCallback<Boolean> callBack);
 	
 
 }

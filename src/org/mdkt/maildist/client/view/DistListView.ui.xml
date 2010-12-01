@@ -21,7 +21,7 @@
 	</ui:style>
 	
 	<g:HTMLPanel>
-		<g:VerticalPanel width="100%">
+		<g:VerticalPanel width="100%" height="100%">
 			<g:cell>
 				<g:HorizontalPanel>
 					<g:cell>

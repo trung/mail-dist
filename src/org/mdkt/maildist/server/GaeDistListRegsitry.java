@@ -6,6 +6,7 @@ package org.mdkt.maildist.server;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.mdkt.maildist.client.dto.Alias;
 import org.mdkt.maildist.client.dto.DistList;
 import org.mdkt.maildist.client.dto.DistListMember;
 
@@ -34,6 +35,11 @@ public class GaeDistListRegsitry implements DistListRegistry {
 	private static final String DIST_LIST_MEMBER_ID = "distListMemberId";
 	private static final String DIST_LIST_MEMBER_NAME = "name";
 	private static final String DIST_LIST_MEMBER_EMAIL = "email";
+	
+	private static final String ALIAS_TYPE = "alias";
+	private static final String ALIAS_ID = "aliasId";
+	private static final String ALIAS_USER_EMAIL = "userEmail";
+	private static final String ALIAS_EMAIL  ="aliasEmail";
 	
 	@Override
 	public void deleteDistLists(ArrayList<String> distListIds) {
@@ -167,4 +173,55 @@ public class GaeDistListRegsitry implements DistListRegistry {
 		}
 	}
 	
+	@Override
+	public void deleteAliases(ArrayList<String> aliasIds) {
+		ArrayList<Key> keys = new ArrayList<Key>();
+    	for (String id : aliasIds) {
+    		keys.add(KeyFactory.createKey(ALIAS_TYPE, id));
+    	}
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    	datastore.delete(keys);
+	}
+	
+	@Override
+	public ArrayList<Alias> findAllAliases(String userEmail) {
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    	Query query = new Query(ALIAS_TYPE);
+    	query.addFilter(ALIAS_USER_EMAIL, FilterOperator.EQUAL, userEmail);
+    	// TODO paging???
+    	Iterator<Entity> entities = datastore.prepare(query).asIterator();
+    	ArrayList<Alias> list = new ArrayList<Alias>();
+    	while (entities.hasNext()) {
+    		Alias alias = new Alias();
+    		Entity e = entities.next();
+    		alias.setAliasId((String) e.getProperty(ALIAS_ID));
+    		alias.setUserEmail((String) e.getProperty(ALIAS_USER_EMAIL));
+    		alias.setEmail((String) e.getProperty(ALIAS_EMAIL));
+    		list.add(alias);
+    	}
+    	return list;
+	}
+
+	@Override
+	public void saveEmailAlias(Alias alias) {
+		Key key = KeyFactory.createKey(ALIAS_TYPE, alias.getAliasId());
+		Entity e = new Entity(key);
+		e.setProperty(ALIAS_ID, alias.getAliasId());
+		e.setProperty(ALIAS_USER_EMAIL, alias.getUserEmail());
+		e.setProperty(ALIAS_EMAIL, alias.getEmail());
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		datastore.put(e);
+	}
+	
+	@Override
+	public String aliasExists(String aliasId) {
+		Key key = KeyFactory.createKey(ALIAS_TYPE, aliasId);
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		try {
+			Entity e = datastore.get(key);
+			return (String) e.getProperty(ALIAS_USER_EMAIL);
+        } catch (EntityNotFoundException e) {
+            return null;
+        }
+	}
 }

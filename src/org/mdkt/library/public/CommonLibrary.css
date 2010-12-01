@@ -1,5 +1,5 @@
 .margin10 {
-	margin: 10px;
+	
 }
 
 .gwt-Button {
@@ -9,4 +9,9 @@
 
 .gwt-MenuBar-vertical .gwt-MenuItem {
 	padding: 4px 10px 4px 10px;
+}
+
+.gwt-TextBox {
+	padding: 5px;
+	border: 1px solid #c9c9c9;
 }

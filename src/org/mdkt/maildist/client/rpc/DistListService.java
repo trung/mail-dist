@@ -2,6 +2,7 @@ package org.mdkt.maildist.client.rpc;
 
 import java.util.ArrayList;
 
+import org.mdkt.maildist.client.dto.Alias;
 import org.mdkt.maildist.client.dto.DistList;
 import org.mdkt.maildist.client.dto.DistListMember;
 
@@ -35,4 +36,8 @@ public interface DistListService extends RemoteService {
 	}
 
 	boolean findDistList(String distListName);
+	ArrayList<Alias> getAliasEmails();
+	void deleteAliasEmails(ArrayList<String> aliasIds);
+	void addEmailAlias(String email);
+	boolean findAlias(String aliasName);
 }

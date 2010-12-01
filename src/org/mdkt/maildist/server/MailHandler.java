@@ -71,9 +71,13 @@ public class MailHandler extends HttpServlet {
 			MimeMessage message = new MimeMessage(session, req.getInputStream());
 			Address[] froms = message.getFrom();
 			InternetAddress fromAddress = (InternetAddress) froms[0];
+			String matchedUserEmail = distListRegistry.aliasExists(fromAddress.getAddress());
+			if (matchedUserEmail != null) {
+				logger.info("FROM address is an alias!");
+				fromAddress = new InternetAddress(matchedUserEmail, fromAddress.getPersonal());
+			}
 			logger.info(new StringBuffer("From=[").append(fromAddress.getAddress())
 					.append("]"));
-
 			// get all emails
 			ArrayList<DistListMember> members = distListRegistry
 					.findDistListMembers(distListId, fromAddress.getAddress());

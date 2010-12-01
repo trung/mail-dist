@@ -153,7 +153,7 @@ public class DistListMembersViewImpl extends Composite implements
 			}
 		};
 		distListMembersTable = new CellTable<DistListMember>(
-				20,
+				10,
 				GWT.<DistListMembersTableResources> create(DistListMembersTableResources.class),
 				key);
 	    // Create a Pager to control the table.

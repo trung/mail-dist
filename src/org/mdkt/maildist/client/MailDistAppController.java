@@ -10,27 +10,36 @@ import org.mdkt.library.client.LoginServiceAsync;
 import org.mdkt.library.client.rpc.DefaultAsyncCallBack;
 import org.mdkt.maildist.client.dto.DistList;
 import org.mdkt.maildist.client.dto.DistListMember;
+import org.mdkt.maildist.client.event.AddAliasEvent;
 import org.mdkt.maildist.client.event.AddDistListEvent;
 import org.mdkt.maildist.client.event.AddDistListMemberEvent;
+import org.mdkt.maildist.client.event.AliasDeletedEvent;
 import org.mdkt.maildist.client.event.DistListDeletedEvent;
 import org.mdkt.maildist.client.event.DistListMemberDeletedEvent;
+import org.mdkt.maildist.client.event.SaveAliasCancelledEvent;
+import org.mdkt.maildist.client.event.SaveAliasEvent;
 import org.mdkt.maildist.client.event.SaveDistListCancelledEvent;
 import org.mdkt.maildist.client.event.SaveDistListEvent;
 import org.mdkt.maildist.client.event.SaveDistListMemberCancelledEvent;
 import org.mdkt.maildist.client.event.SaveDistListMemberEvent;
 import org.mdkt.maildist.client.event.ShowDistListMemberEvent;
+import org.mdkt.maildist.client.presenter.AddAliasPresenter;
 import org.mdkt.maildist.client.presenter.AddDistListMemberPresenter;
 import org.mdkt.maildist.client.presenter.AddDistListPresenter;
+import org.mdkt.maildist.client.presenter.AliasPresenter;
 import org.mdkt.maildist.client.presenter.DistListMembersPresenter;
 import org.mdkt.maildist.client.presenter.DistListPresenter;
 import org.mdkt.maildist.client.rpc.DistListService;
 import org.mdkt.maildist.client.rpc.DistListServiceAsync;
+import org.mdkt.maildist.client.view.AddAliasViewImpl;
 import org.mdkt.maildist.client.view.AddDistListMemberView;
 import org.mdkt.maildist.client.view.AddDistListMemberViewImpl;
 import org.mdkt.maildist.client.view.AddDistListViewImpl;
+import org.mdkt.maildist.client.view.AliasViewImpl;
 import org.mdkt.maildist.client.view.DistListMembersView;
 import org.mdkt.maildist.client.view.DistListMembersViewImpl;
 import org.mdkt.maildist.client.view.DistListViewImpl;
+import org.mdkt.maildist.client.view.MailDistHome;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -44,15 +53,21 @@ import com.google.gwt.user.client.ui.HasWidgets;
  */
 public class MailDistAppController extends AbstractAppController {
 		
-	public static final String MD_HOME = "list";
-	public static final String MD_LIST_ADD = "list/add";
-	public static final String MD_LIST_MEMBERS = "list/members";
+	public static final String MD_HOME = "Distribution List";
+	public static final String MD_LIST_ADD = "Distribution List/add";
+	public static final String MD_LIST_MEMBERS = "Distribution List/members";
+	public static final String MD_ALIAS = "Alias";
+	public static final String MD_ALIAS_ADD = "Alias/add";
+	
+	private final MailDistHome home;
 
 	private final DistListServiceAsync distListService = DistListService.Util.getInstance();
 		
 	public MailDistAppController(HasWidgets container, EventBus eventBus,
 			LoginServiceAsync rpcLoginService) {
 		super(container, eventBus, rpcLoginService);
+		this.home = new MailDistHome();
+		this.container.add(home);
 	}
 
 	@Override
@@ -120,6 +135,34 @@ public class MailDistAppController extends AbstractAppController {
 				History.fireCurrentHistoryState();
 			}
 		});
+		eventBus.addHandler(AddAliasEvent.getType(), new AddAliasEvent.Handler() {
+			
+			@Override
+			public void onAddAlias(AddAliasEvent event) {
+				doAddAlias();
+			}
+		});
+		eventBus.addHandler(SaveAliasCancelledEvent.getType(), new SaveAliasCancelledEvent.Handler() {
+			
+			@Override
+			public void onCancelled(SaveAliasCancelledEvent event) {
+				History.newItem(MD_ALIAS);
+			}
+		});
+		eventBus.addHandler(SaveAliasEvent.getType(), new SaveAliasEvent.Handler() {
+			@Override
+			public void onSaveAlias(SaveAliasEvent event) {
+				doSaveAlias(event.getAlias());
+			}
+
+		});
+		eventBus.addHandler(AliasDeletedEvent.getType(), new AliasDeletedEvent.Handler() {
+			
+			@Override
+			public void onAliasDeleted(AliasDeletedEvent event) {
+				History.fireCurrentHistoryState();
+			}
+		});
 		
 	}
 	
@@ -155,6 +198,14 @@ public class MailDistAppController extends AbstractAppController {
 			}
 		});
 	}
+
+	private void doSaveAlias(String email) {
+		distListService.addEmailAlias(email, new DefaultAsyncCallBack<Void>("save email alias") {
+			public void _onSuccess(Void result) {
+				History.newItem(MD_ALIAS);
+			}
+		});
+	}
 	/**
 	 * navigate to list/add
 	 */
@@ -162,35 +213,30 @@ public class MailDistAppController extends AbstractAppController {
 		History.newItem(MD_LIST_ADD);
 	}
 	
+	private void doAddAlias() {
+		History.newItem(MD_ALIAS_ADD);
+	}
+	
 	@Override
 	protected void onHistoryChange(String token) {
 		if (MD_HOME.equals(token)) {
-			GWT.runAsync(new RunAsyncCallback() {
-				@Override
-				public void onFailure(Throwable reason) {
-				}
-				
-				@Override
-				public void onSuccess() {
-					new DistListPresenter(distListService, eventBus, new DistListViewImpl()).go(container);
-				}
-			});
+			HasWidgets tabContainer = home.selectTab(MD_HOME);
+			new DistListPresenter(distListService, eventBus, new DistListViewImpl()).go(tabContainer);
 		} else if (MD_LIST_ADD.equals(token)) {
-			GWT.runAsync(new RunAsyncCallback() {
-				@Override
-				public void onFailure(Throwable reason) {
-				}
-				
-				@Override
-				public void onSuccess() {
-					new AddDistListPresenter(distListService, eventBus, new AddDistListViewImpl()).go(container);
-				}
-			});
+			HasWidgets tabContainer = home.selectTab(MD_HOME);
+			new AddDistListPresenter(distListService, eventBus, new AddDistListViewImpl()).go(tabContainer);
 		} else if (token.startsWith(MD_LIST_MEMBERS)) {
 			// extract distListId from the token
 			String distListId = token.substring(token.lastIndexOf("/") + 1);
 			DistListMembersView view = new DistListMembersViewImpl();
-			new DistListMembersPresenter(distListService, eventBus, view, distListId).go(container);		
+			HasWidgets tabContainer = home.selectTab(MD_HOME);
+			new DistListMembersPresenter(distListService, eventBus, view, distListId).go(tabContainer);		
+		} else 	if (MD_ALIAS.equals(token)) {
+			HasWidgets tabContainer = home.selectTab(MD_ALIAS);
+			new AliasPresenter(distListService, eventBus, new AliasViewImpl()).go(tabContainer);
+		} else if (MD_ALIAS_ADD.equals(token)) {
+			HasWidgets tabContainer = home.selectTab(MD_ALIAS);
+			new AddAliasPresenter(distListService, eventBus, new AddAliasViewImpl()).go(tabContainer);
 		}
 	}
 }
