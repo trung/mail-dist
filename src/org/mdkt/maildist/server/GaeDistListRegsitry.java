@@ -187,7 +187,7 @@ public class GaeDistListRegsitry implements DistListRegistry {
 	public ArrayList<Alias> findAllAliases(String userEmail) {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     	Query query = new Query(ALIAS_TYPE);
-    	query.addFilter(ALIAS_USER_EMAIL, FilterOperator.EQUAL, userEmail);
+    	query.addFilter(ALIAS_USER_EMAIL, FilterOperator.EQUAL, userEmail.toLowerCase());
     	// TODO paging???
     	Iterator<Entity> entities = datastore.prepare(query).asIterator();
     	ArrayList<Alias> list = new ArrayList<Alias>();
@@ -207,7 +207,7 @@ public class GaeDistListRegsitry implements DistListRegistry {
 		Key key = KeyFactory.createKey(ALIAS_TYPE, alias.getAliasId());
 		Entity e = new Entity(key);
 		e.setProperty(ALIAS_ID, alias.getAliasId());
-		e.setProperty(ALIAS_USER_EMAIL, alias.getUserEmail());
+		e.setProperty(ALIAS_USER_EMAIL, alias.getUserEmail().toLowerCase());
 		e.setProperty(ALIAS_EMAIL, alias.getEmail());
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		datastore.put(e);
