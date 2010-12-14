@@ -73,6 +73,7 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
                 emptyIfNull((String)user.getProperty(USER_LASTNAME)),
                 roles,
                 (Boolean)user.getProperty(USER_ENABLED));
+        gaeUser.setLastSignedIn((Long)user.getProperty(USER_LAST_SIGNED_IN));
 
         return gaeUser;
 	}

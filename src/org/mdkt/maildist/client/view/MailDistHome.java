@@ -73,7 +73,8 @@ public class MailDistHome extends Composite {
 	
 	public HasWidgets selectTab(String tabName) {
 		int index = getIndexByTabName(tabName);
-		tabBar.selectTab(index);
+		if (tabBar.getSelectedIndex() != index)
+			tabBar.selectTab(index);
 		return tabContainers.get(tabName);
 	}
 	

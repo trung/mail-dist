@@ -13,8 +13,7 @@ import org.mdkt.library.security.users.AppRole;
 import org.mdkt.library.security.users.GaeUser;
 import org.mdkt.library.security.users.UserRegistry;
 import org.springframework.security.core.GrantedAuthority;
-
-import com.google.appengine.api.users.UserServiceFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class UsersServiceImpl implements UsersService {
 	
@@ -42,7 +41,7 @@ public class UsersServiceImpl implements UsersService {
 	public ArrayList<User> getUserDetails() {
 		List<GaeUser> gaeUsers = userRegistry.getAllGaeUsers();
 		ArrayList<User> users =  new ArrayList<User>();
-		final String currentUserId = UserServiceFactory.getUserService().getCurrentUser().getUserId();
+		final String currentUserId = ((GaeUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 		for (GaeUser gu : gaeUsers) {
 			User u = new User();
 			u.setUserId(gu.getUserId());

@@ -41,8 +41,6 @@ import org.mdkt.maildist.client.view.DistListMembersViewImpl;
 import org.mdkt.maildist.client.view.DistListViewImpl;
 import org.mdkt.maildist.client.view.MailDistHome;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -178,7 +176,8 @@ public class MailDistAppController extends AbstractAppController {
 
 	private void doAddDistListMemberEvent(String distListId) {
 		AddDistListMemberView view = new AddDistListMemberViewImpl();
-		new AddDistListMemberPresenter(distListService, eventBus, view, distListId).go(container);
+		HasWidgets tabContainer = home.selectTab(MD_HOME);
+		new AddDistListMemberPresenter(distListService, eventBus, view, distListId).go(tabContainer);
 	}
 	
 	private void doShowDistListMembers(String distListId) {
